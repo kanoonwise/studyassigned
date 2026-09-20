@@ -24,4 +24,9 @@ export const toolsIndex = [
     title: "AI-Use Disclosure Generator",
     body: "Generate a ready statement describing how you used AI tools in your work.",
   },
+  {
+    href: "/tools/appeal-kit",
+    title: "AI-Flag Appeal Kit",
+    body: "An evidence checklist and a starting draft for appealing an AI-generated content flag.",
+  },
 ];

@@ -68,3 +68,11 @@ test("an unknown institution code 404s", async ({ page }) => {
   const response = await page.goto("/universities/DOES-NOT-EXIST");
   expect(response?.status()).toBe(404);
 });
+
+test("the AI-Flag Appeal Kit drafts a letter", async ({ page }) => {
+  await page.goto("/tools/appeal-kit");
+  await page.getByLabel("Your name").fill("Asha Rao");
+  await page.getByLabel("Institution").fill("Test University");
+  await page.getByRole("button", { name: "Draft letter" }).click();
+  await expect(page.locator("pre")).toContainText("Asha Rao");
+});

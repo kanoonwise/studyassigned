@@ -4,7 +4,14 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { rateLimit, clientIpFrom } from "@/lib/rate-limit";
 
-const TOOLS = ["ugc-level", "resubmission", "quote", "timeline", "disclosure"] as const;
+const TOOLS = [
+  "ugc-level",
+  "resubmission",
+  "quote",
+  "timeline",
+  "disclosure",
+  "appeal-letter",
+] as const;
 
 const logSchema = z.object({
   tool: z.enum(TOOLS),

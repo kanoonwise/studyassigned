@@ -16,6 +16,7 @@ const STATIC_PATHS = [
   "/tools/quote",
   "/tools/timeline",
   "/tools/disclosure",
+  "/tools/appeal-kit",
   "/universities",
 ];
 
