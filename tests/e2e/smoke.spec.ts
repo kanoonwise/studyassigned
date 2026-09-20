@@ -50,3 +50,16 @@ test("the AI-Use Disclosure Generator produces a statement", async ({ page }) =>
   await page.getByRole("button", { name: "Generate statement" }).click();
   await expect(page.locator("pre")).toContainText("AI-Use Disclosure");
 });
+
+test("the universities search page loads with a search box", async ({ page }) => {
+  const response = await page.goto("/universities");
+  expect(response?.status()).toBe(200);
+  await expect(
+    page.getByPlaceholder("Search by institution name, state or district"),
+  ).toBeVisible();
+});
+
+test("an unknown institution code 404s", async ({ page }) => {
+  const response = await page.goto("/universities/DOES-NOT-EXIST");
+  expect(response?.status()).toBe(404);
+});
