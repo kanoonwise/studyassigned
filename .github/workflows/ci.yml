@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+# Build-time Supabase env vars are dummy values: `next build` never calls out
+# to Supabase (every call site lives behind cookies()/request-time code, which
+# opts those routes into dynamic rendering), it just needs non-empty strings
+# for the client constructors.
+env:
+  NEXT_PUBLIC_SITE_NAME: StudyAssigned
+  NEXT_PUBLIC_SUPABASE_URL: https://ci-placeholder.supabase.co
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-anon-key
+  SUPABASE_SERVICE_ROLE_KEY: ci-placeholder-service-role-key
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Copy lint (banned phrases)
+        run: npm run copy-lint
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end smoke tests
+        run: npm run e2e
