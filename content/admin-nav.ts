@@ -15,5 +15,6 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { href: "/admin/prices", label: "Prices", roles: ["admin"] },
   { href: "/admin/leads", label: "Leads", roles: ["admin", "ops"] },
   { href: "/admin/orders", label: "Orders", roles: ["admin", "ops"] },
+  { href: "/admin/report-reviews", label: "Report Decodes", roles: ["admin", "ops"] },
   { href: "/admin/audit", label: "Audit Log", roles: ["admin"] },
 ];

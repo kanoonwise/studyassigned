@@ -18,7 +18,7 @@ export default async function AccountPage() {
     redirect("/login?next=/account");
   }
 
-  const [{ data: orders }, { data: documents }] = await Promise.all([
+  const [{ data: orders }, { data: documents }, { data: reportReviews }] = await Promise.all([
     supabase
       .from("orders")
       .select("id, service, status, quote, due_date, created_at")
@@ -29,6 +29,13 @@ export default async function AccountPage() {
       .select("id, path, uploaded_at, delete_after")
       .eq("owner", user.id)
       .order("uploaded_at", { ascending: false }),
+    supabase
+      .from("report_reviews")
+      .select(
+        "id, status, top_sources, references_vs_overlap, self_plagiarism, first_fixes, created_at",
+      )
+      .eq("student_id", user.id)
+      .order("created_at", { ascending: false }),
   ]);
 
   return (
@@ -77,6 +84,48 @@ export default async function AccountPage() {
           <UploadForm />
         </div>
       </div>
+
+      {reportReviews && reportReviews.length > 0 ? (
+        <div>
+          <h2 className="text-lg font-semibold">Similarity report decodes</h2>
+          <ul className="mt-4 flex flex-col gap-4">
+            {reportReviews.map((review) => (
+              <li
+                key={review.id}
+                className="rounded-lg border border-zinc-200 p-4 text-sm dark:border-zinc-800"
+              >
+                <p className="font-medium">Status: {review.status}</p>
+                {review.status === "completed" ? (
+                  <div className="mt-2 flex flex-col gap-2 text-zinc-600 dark:text-zinc-400">
+                    {review.top_sources ? (
+                      <p>
+                        <strong>Top matching sources:</strong> {review.top_sources}
+                      </p>
+                    ) : null}
+                    {review.references_vs_overlap ? (
+                      <p>
+                        <strong>References vs real overlap:</strong> {review.references_vs_overlap}
+                      </p>
+                    ) : null}
+                    {review.self_plagiarism ? (
+                      <p>
+                        <strong>Self-plagiarism:</strong> {review.self_plagiarism}
+                      </p>
+                    ) : null}
+                    {review.first_fixes ? (
+                      <p>
+                        <strong>Suggested first fixes:</strong> {review.first_fixes}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : (
+                  <p className="mt-1 text-zinc-500">A reviewer will complete this shortly.</p>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
     </div>
   );
 }

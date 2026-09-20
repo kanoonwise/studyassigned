@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { deleteDocument, getSignedDownloadUrl } from "./actions";
+import { deleteDocument, getSignedDownloadUrl, requestReportReview } from "./actions";
 
 interface Document {
   id: string;
@@ -12,6 +12,7 @@ interface Document {
 
 export function DocumentRow({ document }: { document: Document }) {
   const [busy, setBusy] = useState(false);
+  const [requested, setRequested] = useState(false);
   const filename = document.path.split("/").pop();
 
   async function handleDownload() {
@@ -25,6 +26,13 @@ export function DocumentRow({ document }: { document: Document }) {
     if (!confirm("Delete this document? This cannot be undone.")) return;
     setBusy(true);
     await deleteDocument(document.id);
+  }
+
+  async function handleRequestReview() {
+    setBusy(true);
+    const result = await requestReportReview(document.id);
+    setBusy(false);
+    if (!result.error) setRequested(true);
   }
 
   return (
@@ -53,6 +61,18 @@ export function DocumentRow({ document }: { document: Document }) {
         >
           Delete
         </button>
+        {requested ? (
+          <span className="px-3 py-1 text-zinc-500">Decode requested</span>
+        ) : (
+          <button
+            type="button"
+            onClick={handleRequestReview}
+            disabled={busy}
+            className="rounded-full border border-zinc-300 px-3 py-1 dark:border-zinc-700"
+          >
+            Request report decode
+          </button>
+        )}
       </div>
     </li>
   );

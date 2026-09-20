@@ -94,6 +94,23 @@ export async function deleteDocument(documentId: string) {
   return { error: null };
 }
 
+export async function requestReportReview(documentId: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Not signed in." };
+
+  const { error } = await supabase.from("report_reviews").insert({
+    document_id: documentId,
+    student_id: user.id,
+  });
+  if (error) return { error: error.message };
+
+  revalidatePath("/account");
+  return { error: null };
+}
+
 export async function getSignedDownloadUrl(documentId: string) {
   const supabase = await createClient();
   const { data: doc } = await supabase
