@@ -314,6 +314,27 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["reviews"]["Row"]>;
         Relationships: [];
       };
+      report_reviews: {
+        Row: {
+          id: string;
+          document_id: string;
+          student_id: string;
+          reviewer_id: string | null;
+          status: "requested" | "in_review" | "completed";
+          top_sources: string | null;
+          references_vs_overlap: string | null;
+          self_plagiarism: string | null;
+          first_fixes: string | null;
+          created_at: string;
+          completed_at: string | null;
+        };
+        Insert: Partial<Database["public"]["Tables"]["report_reviews"]["Row"]> & {
+          document_id: string;
+          student_id: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["report_reviews"]["Row"]>;
+        Relationships: [];
+      };
     };
     Views: {
       public_institutions: {
