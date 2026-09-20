@@ -10,6 +10,11 @@ test("a signed-out visitor is redirected away from /admin", async ({ page }) => 
   await expect(page).toHaveURL(/\/login/);
 });
 
+test("a signed-out visitor is redirected away from /account", async ({ page }) => {
+  await page.goto("/account");
+  await expect(page).toHaveURL(/\/login/);
+});
+
 test.describe("public pages", () => {
   for (const path of [
     "/services",
