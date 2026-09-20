@@ -220,6 +220,7 @@ export interface Database {
           consent_at: string;
           flagged: boolean;
           flag_reason: string | null;
+          handled_at: string | null;
         };
         Insert: Partial<Database["public"]["Tables"]["leads"]["Row"]> & { consent_at: string };
         Update: Partial<Database["public"]["Tables"]["leads"]["Row"]>;
