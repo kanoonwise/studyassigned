@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { isPastDate, daysUntil, suggestServiceForDeadline } from "@/lib/tools/deadline-status";
+import {
+  isPastDate,
+  daysUntil,
+  isWithinReminderWindow,
+  suggestServiceForDeadline,
+} from "@/lib/tools/deadline-status";
 
 describe("isPastDate", () => {
   it("is true for a date before today", () => {
@@ -26,6 +31,18 @@ describe("daysUntil", () => {
 
   it("is negative for a past date", () => {
     expect(daysUntil("2026-05-01", new Date("2026-06-01"))).toBe(-31);
+  });
+});
+
+describe("isWithinReminderWindow", () => {
+  it("is true for today and up to 7 days out", () => {
+    expect(isWithinReminderWindow("2026-06-01", new Date("2026-06-01"))).toBe(true);
+    expect(isWithinReminderWindow("2026-06-08", new Date("2026-06-01"))).toBe(true);
+  });
+
+  it("is false beyond the window or in the past", () => {
+    expect(isWithinReminderWindow("2026-06-09", new Date("2026-06-01"))).toBe(false);
+    expect(isWithinReminderWindow("2026-05-31", new Date("2026-06-01"))).toBe(false);
   });
 });
 

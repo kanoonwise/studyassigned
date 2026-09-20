@@ -89,3 +89,29 @@ export async function sendOrderStatusEmail(to: string, service: string, status: 
     ].join("\n"),
   });
 }
+
+export async function sendDeadlineReminderEmail(
+  contact: string,
+  institutionName: string,
+  eventType: string,
+  exactDate: string,
+  unsubscribeUrl: string,
+) {
+  const resend = client();
+  if (!resend) return;
+
+  await resend.emails.send({
+    from: FROM,
+    to: contact,
+    subject: `Reminder: ${institutionName} - ${eventType}`,
+    text: [
+      `${eventType} - ${exactDate}`,
+      "",
+      "This is a verified date. Check the institution page for the evidence link.",
+      "",
+      "Informational only. Your institution's own rules and official notices apply.",
+      "",
+      `Unsubscribe from this reminder: ${unsubscribeUrl}`,
+    ].join("\n"),
+  });
+}

@@ -64,8 +64,31 @@ export default async function InstitutionPage({ params }: { params: Promise<{ co
 
   const { institution, authority, deadlines } = data;
 
+  const eventJsonLd =
+    institution.status === "verified"
+      ? deadlines
+          .filter((d) => d.exact_date && !isPastDate(d.exact_date))
+          .map((d) => ({
+            "@context": "https://schema.org",
+            "@type": "Event",
+            name: d.event_type,
+            startDate: d.exact_date,
+            eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+            eventStatus: "https://schema.org/EventScheduled",
+            location: { "@type": "Place", name: institution.name },
+            organizer: { "@type": "EducationalOrganization", name: institution.name },
+          }))
+      : [];
+
   return (
     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6">
+      {eventJsonLd.map((event, i) => (
+        <script
+          key={i}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(event) }}
+        />
+      ))}
       <h1 className="text-3xl font-semibold tracking-tight">{institution.name}</h1>
       <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
         {institution.kind} · {institution.district ? `${institution.district}, ` : ""}
@@ -194,11 +217,12 @@ export default async function InstitutionPage({ params }: { params: Promise<{ co
         ) : null}
       </div>
 
-      {institution.status !== "verified" ? (
-        <div className="mt-6">
-          <DeadlineAlertForm institutionCode={institution.aishe_code} />
-        </div>
-      ) : null}
+      <div className="mt-6">
+        <DeadlineAlertForm
+          institutionCode={institution.aishe_code}
+          verified={institution.status === "verified"}
+        />
+      </div>
 
       <p className="mt-8 text-sm text-zinc-500">
         Informational only. Your institution&apos;s own rules and official notices apply.

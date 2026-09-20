@@ -17,6 +17,14 @@ export function daysUntil(dateIso: string, today: Date = new Date()): number {
   return Math.round((date.getTime() - todayStart.getTime()) / DAY_MS);
 }
 
+export const REMINDER_WINDOW_DAYS = 7;
+
+/** True once a verified date is close enough to send a "coming up" reminder for. */
+export function isWithinReminderWindow(dateIso: string, today: Date = new Date()): boolean {
+  const days = daysUntil(dateIso, today);
+  return days >= 0 && days <= REMINDER_WINDOW_DAYS;
+}
+
 export interface ServiceSuggestion {
   label: string;
   href: string;
