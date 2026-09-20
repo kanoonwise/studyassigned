@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { writeAuditLog } from "@/lib/db/audit";
+import { sendDeadlineVerifiedNotification } from "@/lib/email";
 
 export async function assignOwner(authorityCode: string, owner: string) {
   const supabase = await createClient();
@@ -71,11 +72,14 @@ export async function markVerified(authorityCode: string, formData: FormData) {
     .eq("aishe_code", authorityCode);
   if (authorityError) return { error: authorityError.message };
 
-  const { error: institutionsError } = await supabase
+  const { data: coveredInstitutions, error: institutionsError } = await supabase
     .from("institutions")
     .update({ status: "verified" })
-    .eq("calendar_authority_code", authorityCode);
+    .eq("calendar_authority_code", authorityCode)
+    .select("aishe_code, name");
   if (institutionsError) return { error: institutionsError.message };
+
+  await queueDeadlineAlerts(supabase, coveredInstitutions ?? [], eventType, exactDate);
 
   await writeAuditLog(supabase, {
     action: "mark_verified",
@@ -93,4 +97,34 @@ export async function markVerified(authorityCode: string, formData: FormData) {
   revalidatePath("/admin/verification");
   revalidatePath("/admin/institutions");
   return { error: null };
+}
+
+async function queueDeadlineAlerts(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  institutions: { aishe_code: string; name: string }[],
+  eventType: string,
+  exactDate: string,
+) {
+  const codes = institutions.map((i) => i.aishe_code);
+  if (codes.length === 0) return;
+
+  const { data: alerts } = await supabase
+    .from("deadline_alerts")
+    .select("id, institution_code, contact")
+    .in("institution_code", codes)
+    .is("notified_at", null);
+
+  for (const alert of alerts ?? []) {
+    const institution = institutions.find((i) => i.aishe_code === alert.institution_code);
+    await sendDeadlineVerifiedNotification(
+      alert.contact,
+      institution?.name ?? "Your institution",
+      eventType,
+      exactDate,
+    );
+    await supabase
+      .from("deadline_alerts")
+      .update({ notified_at: new Date().toISOString() })
+      .eq("id", alert.id);
+  }
 }
