@@ -34,3 +34,19 @@ test("the contact page has an enquiry form with required consent", async ({ page
   await expect(page.getByRole("checkbox")).toHaveAttribute("required", "");
   await expect(page.getByRole("button", { name: "Send enquiry" })).toBeVisible();
 });
+
+test("the Thesis Timeline Planner computes and offers an .ics download", async ({ page }) => {
+  await page.goto("/tools/timeline");
+  await page.getByLabel("Submission date").fill("2026-12-01");
+  await page.getByRole("button", { name: "Build timeline" }).click();
+  await expect(page.getByText("Final submission")).toBeVisible();
+  await expect(page.getByRole("button", { name: /Download as calendar/ })).toBeVisible();
+});
+
+test("the AI-Use Disclosure Generator produces a statement", async ({ page }) => {
+  await page.goto("/tools/disclosure");
+  await page.getByLabel("From", { exact: true }).fill("2026-01-01");
+  await page.getByLabel("To", { exact: true }).fill("2026-01-10");
+  await page.getByRole("button", { name: "Generate statement" }).click();
+  await expect(page.locator("pre")).toContainText("AI-Use Disclosure");
+});

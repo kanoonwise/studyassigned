@@ -9,6 +9,12 @@ const STATIC_PATHS = [
   "/contact",
   "/terms",
   "/privacy",
+  "/tools",
+  "/tools/ugc-level",
+  "/tools/resubmission",
+  "/tools/quote",
+  "/tools/timeline",
+  "/tools/disclosure",
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
