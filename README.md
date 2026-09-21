@@ -76,6 +76,17 @@ Not required for Phase 0. `RESEND_API_KEY` is used starting Phase 1 (enquiry
 emails); `RAZORPAY_*` starting Phase 5; `WHATSAPP_NUMBER` is just a phone
 number for `wa.me` links, starting Phase 1.
 
+For Razorpay (Phase 5): create a webhook in the Razorpay dashboard pointed at
+`<your-domain>/api/webhooks/razorpay`, subscribed to at least
+`payment.captured`, and put its signing secret in `RAZORPAY_WEBHOOK_SECRET`.
+Test in Razorpay's test mode before ever pointing this at live keys.
+
+### 5. Supabase Storage
+
+The `documents` bucket and its RLS policies are created by the migrations
+(`supabase/migrations/0015_storage.sql`, `0016_storage_staff_delivery.sql`) -
+nothing to do here beyond running `supabase db push`.
+
 ## Database migrations
 
 Everything lives in `supabase/migrations/`, applied in filename order by

@@ -1,6 +1,12 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "./types";
+import {
+  sanitizeReferralCode,
+  referralCookieMaxAge,
+  REFERRAL_COOKIE,
+  CONSENT_COOKIE,
+} from "@/lib/referral";
 
 const STAFF_ROLES = new Set(["admin", "verifier", "ops"]);
 
@@ -56,6 +62,21 @@ export async function updateSession(request: NextRequest) {
       url.pathname = "/";
       return NextResponse.redirect(url);
     }
+  }
+
+  // A ?ref= on this request takes priority; otherwise carry forward a
+  // code already captured earlier this visit, so consenting on a later
+  // page can still upgrade it to the persistent cookie below.
+  const ref =
+    sanitizeReferralCode(request.nextUrl.searchParams.get("ref")) ??
+    sanitizeReferralCode(request.cookies.get(REFERRAL_COOKIE)?.value);
+  if (ref) {
+    const consented = request.cookies.get(CONSENT_COOKIE)?.value === "accepted";
+    response.cookies.set(REFERRAL_COOKIE, ref, {
+      maxAge: referralCookieMaxAge(consented),
+      path: "/",
+      sameSite: "lax",
+    });
   }
 
   return response;
