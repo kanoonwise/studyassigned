@@ -5,6 +5,7 @@ import { verifyTurnstileToken } from "@/lib/turnstile";
 import { rateLimit, clientIpFrom } from "@/lib/rate-limit";
 import { screenEnquiry } from "@/lib/intake-screening";
 import { sendEnquiryNotification } from "@/lib/email";
+import { sanitizeReferralCode, REFERRAL_COOKIE } from "@/lib/referral";
 
 const enquirySchema = z.object({
   name: z.string().trim().min(1).max(200),
@@ -48,6 +49,7 @@ export async function POST(request: NextRequest) {
   }
 
   const screening = screenEnquiry(data.message);
+  const referralCode = sanitizeReferralCode(request.cookies.get(REFERRAL_COOKIE)?.value);
 
   const supabase = await createClient();
   const { error } = await supabase.from("leads").insert({
@@ -61,6 +63,7 @@ export async function POST(request: NextRequest) {
     consent_at: new Date().toISOString(),
     flagged: screening.flagged,
     flag_reason: screening.reason,
+    referral_code: referralCode,
   });
 
   if (error) {

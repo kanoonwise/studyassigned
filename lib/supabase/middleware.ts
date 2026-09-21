@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "./types";
+import { sanitizeReferralCode, REFERRAL_COOKIE } from "@/lib/referral";
 
 const STAFF_ROLES = new Set(["admin", "verifier", "ops"]);
 
@@ -56,6 +57,15 @@ export async function updateSession(request: NextRequest) {
       url.pathname = "/";
       return NextResponse.redirect(url);
     }
+  }
+
+  const ref = sanitizeReferralCode(request.nextUrl.searchParams.get("ref"));
+  if (ref) {
+    response.cookies.set(REFERRAL_COOKIE, ref, {
+      maxAge: 60 * 60 * 24 * 30,
+      path: "/",
+      sameSite: "lax",
+    });
   }
 
   return response;

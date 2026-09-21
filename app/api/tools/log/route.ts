@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { rateLimit, clientIpFrom } from "@/lib/rate-limit";
+import { sanitizeReferralCode, REFERRAL_COOKIE } from "@/lib/referral";
 
 const TOOLS = [
   "ugc-level",
@@ -48,6 +49,7 @@ export async function POST(request: NextRequest) {
       source: `tool:${tool}`,
       consent_at: new Date().toISOString(),
       message: `Requested their ${tool} result by email.`,
+      referral_code: sanitizeReferralCode(request.cookies.get(REFERRAL_COOKIE)?.value),
     });
     if (leadError) {
       return NextResponse.json({ error: "Could not save your request." }, { status: 500 });
