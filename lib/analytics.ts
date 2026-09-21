@@ -1,3 +1,5 @@
+import { CONSENT_COOKIE } from "@/lib/referral";
+
 export const ANALYTICS_CONSENT_KEY = "sa-analytics-consent";
 
 export type ConsentChoice = "accepted" | "declined";
@@ -17,6 +19,10 @@ export function storeConsent(choice: ConsentChoice) {
   } catch {
     // Private browsing or blocked storage - the banner just reappears next visit.
   }
+  // Also as a cookie (1 year), the only form the proxy can read - it's
+  // what upgrades a same-visit referral cookie to the full 30-day
+  // attribution window once the visitor has actually consented.
+  document.cookie = `${CONSENT_COOKIE}=${choice}; max-age=${60 * 60 * 24 * 365}; path=/; samesite=lax`;
 }
 
 /**

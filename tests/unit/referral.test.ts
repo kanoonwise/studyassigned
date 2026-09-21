@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { sanitizeReferralCode } from "@/lib/referral";
+import { sanitizeReferralCode, referralCookieMaxAge } from "@/lib/referral";
 
 describe("sanitizeReferralCode", () => {
   it("uppercases a clean code", () => {
@@ -22,5 +22,15 @@ describe("sanitizeReferralCode", () => {
     expect(sanitizeReferralCode(undefined)).toBeNull();
     expect(sanitizeReferralCode("   ")).toBeNull();
     expect(sanitizeReferralCode(";;;")).toBeNull();
+  });
+});
+
+describe("referralCookieMaxAge", () => {
+  it("is session-only (undefined) without consent", () => {
+    expect(referralCookieMaxAge(false)).toBeUndefined();
+  });
+
+  it("is a 30-day persistent cookie once consented", () => {
+    expect(referralCookieMaxAge(true)).toBe(60 * 60 * 24 * 30);
   });
 });
