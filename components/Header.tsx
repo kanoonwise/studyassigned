@@ -1,19 +1,23 @@
 import Link from "next/link";
+import { GraduationCap } from "lucide-react";
 import { PRIMARY_NAV } from "@/content/nav";
 
 export function Header() {
   return (
-    <header className="border-b border-zinc-200 dark:border-zinc-800">
+    <header className="sticky top-0 z-40 border-b border-zinc-200/80 bg-white/80 backdrop-blur-sm dark:border-zinc-800/80 dark:bg-zinc-950/80">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
-        <Link href="/" className="text-lg font-semibold tracking-tight">
+        <Link href="/" className="flex items-center gap-2 text-lg font-semibold tracking-tight">
+          <span className="bg-primary text-primary-foreground flex h-9 w-9 items-center justify-center rounded-xl">
+            <GraduationCap className="h-5 w-5" strokeWidth={2.25} />
+          </span>
           {process.env.NEXT_PUBLIC_SITE_NAME ?? "StudyAssigned"}
         </Link>
-        <nav aria-label="Primary" className="hidden gap-6 text-sm md:flex">
+        <nav aria-label="Primary" className="hidden gap-6 text-sm font-medium md:flex">
           {PRIMARY_NAV.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
+              className="hover:text-primary dark:hover:text-primary text-zinc-600 transition-colors dark:text-zinc-400"
             >
               {item.label}
             </Link>
@@ -21,7 +25,7 @@ export function Header() {
         </nav>
         <Link
           href="/contact"
-          className="rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+          className="bg-primary text-primary-foreground shadow-primary/30 rounded-full px-4 py-2 text-sm font-medium shadow-sm transition-transform hover:scale-[1.03]"
         >
           Get in touch
         </Link>

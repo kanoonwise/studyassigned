@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { Search } from "lucide-react";
 
 interface Result {
   aishe_code: string;
@@ -43,21 +44,24 @@ export function UniversitySearch() {
 
   return (
     <div className="relative">
-      <input
-        type="text"
-        value={query}
-        onChange={(event) => handleChange(event.target.value)}
-        onFocus={() => setOpen(results.length > 0)}
-        placeholder="Search by institution name, state or district"
-        className="w-full rounded border border-zinc-300 px-4 py-3 text-sm dark:border-zinc-700"
-      />
+      <div className="relative">
+        <Search className="pointer-events-none absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+        <input
+          type="text"
+          value={query}
+          onChange={(event) => handleChange(event.target.value)}
+          onFocus={() => setOpen(results.length > 0)}
+          placeholder="Search by institution name, state or district"
+          className="focus:border-primary focus:ring-primary/20 w-full rounded-full border border-zinc-300 bg-white py-3 pr-4 pl-11 text-sm shadow-sm focus:ring-2 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900"
+        />
+      </div>
       {open && results.length > 0 ? (
-        <ul className="absolute z-10 mt-1 w-full rounded border border-zinc-200 bg-white text-sm shadow-lg dark:border-zinc-800 dark:bg-zinc-950">
+        <ul className="absolute z-10 mt-2 w-full rounded-2xl border border-zinc-200 bg-white text-sm shadow-lg dark:border-zinc-800 dark:bg-zinc-950">
           {results.map((result) => (
             <li key={result.aishe_code}>
               <Link
                 href={`/universities/${result.aishe_code}`}
-                className="block px-4 py-2 hover:bg-zinc-50 dark:hover:bg-zinc-900"
+                className="hover:bg-primary-soft block rounded-2xl px-4 py-3"
                 onClick={() => setOpen(false)}
               >
                 <span className="font-medium">{result.name}</span>
