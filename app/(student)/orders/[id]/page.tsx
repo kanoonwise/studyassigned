@@ -7,11 +7,13 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
   const { id } = await params;
   const supabase = await createClient();
 
-  const [{ data: order }, { data: events }, { data: review }] = await Promise.all([
-    supabase.from("orders").select("*").eq("id", id).single(),
-    supabase.from("order_events").select("event, at").eq("order_id", id).order("at"),
-    supabase.from("reviews").select("id").eq("order_id", id).maybeSingle(),
-  ]);
+  const [{ data: order }, { data: events }, { data: review }, { data: payments }] =
+    await Promise.all([
+      supabase.from("orders").select("*").eq("id", id).single(),
+      supabase.from("order_events").select("event, at").eq("order_id", id).order("at"),
+      supabase.from("reviews").select("id").eq("order_id", id).maybeSingle(),
+      supabase.from("payments").select("status").eq("order_id", id).eq("status", "captured"),
+    ]);
 
   if (!order) notFound();
 
@@ -33,6 +35,15 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           milestone="final"
           label="Pay remaining balance"
         />
+      ) : null}
+
+      {payments && payments.length > 0 ? (
+        <a
+          href={`/api/orders/${order.id}/invoice`}
+          className="self-start rounded-full border border-zinc-300 px-4 py-2 text-sm dark:border-zinc-700"
+        >
+          Download receipt (PDF)
+        </a>
       ) : null}
 
       <div>
