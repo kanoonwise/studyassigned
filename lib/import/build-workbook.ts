@@ -103,6 +103,21 @@ export function institutionsToCsv(institutions: Institution[]): string {
   return lines.join("\n");
 }
 
+/** Geo-target export (Phase 6, admin-only) in the layout of the source
+ * workbook's "Geo Targeting" sheet, for pasting into ad platform tools. */
+export function geoTargetingToCsv(institutions: Institution[]): string {
+  const headers = ["aishe_code", "name", "geo_target", "maps_url", "inner_km", "outer_km"];
+  const lines = [headers.join(",")];
+  for (const inst of institutions.filter((i) => i.geo_target)) {
+    lines.push(
+      headers
+        .map((h) => csvEscape(String((inst as unknown as Record<string, unknown>)[h] ?? "")))
+        .join(","),
+    );
+  }
+  return lines.join("\n");
+}
+
 function csvEscape(value: string): string {
   if (/[",\n]/.test(value)) {
     return `"${value.replace(/"/g, '""')}"`;

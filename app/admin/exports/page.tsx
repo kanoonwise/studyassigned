@@ -48,6 +48,20 @@ export default function AdminExportsPage() {
           </button>
         </form>
       </div>
+
+      <div>
+        <h2 className="font-medium">Geo-targeting export</h2>
+        <p className="text-sm text-zinc-500">
+          In the layout of the source workbook&apos;s Geo Targeting sheet, for ad platform campaign
+          setup. Admin-only, never public.
+        </p>
+        <a
+          href="/api/admin/export/geo-targeting"
+          className="mt-2 inline-block rounded-full bg-zinc-900 px-6 py-2 text-sm text-white dark:bg-zinc-100 dark:text-zinc-900"
+        >
+          Download .csv
+        </a>
+      </div>
     </div>
   );
 }
