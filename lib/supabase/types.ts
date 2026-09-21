@@ -221,6 +221,7 @@ export interface Database {
           flagged: boolean;
           flag_reason: string | null;
           handled_at: string | null;
+          referral_code: string | null;
         };
         Insert: Partial<Database["public"]["Tables"]["leads"]["Row"]> & { consent_at: string };
         Update: Partial<Database["public"]["Tables"]["leads"]["Row"]>;
@@ -297,9 +298,116 @@ export interface Database {
           sha256: string | null;
           uploaded_at: string;
           delete_after: string | null;
+          vault_project_id: string | null;
+          version_label: string | null;
         };
         Insert: Partial<Database["public"]["Tables"]["documents"]["Row"]> & { path: string };
         Update: Partial<Database["public"]["Tables"]["documents"]["Row"]>;
+        Relationships: [];
+      };
+      vault_projects: {
+        Row: { id: string; owner: string; title: string; created_at: string };
+        Insert: Partial<Database["public"]["Tables"]["vault_projects"]["Row"]> & {
+          owner: string;
+          title: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["vault_projects"]["Row"]>;
+        Relationships: [];
+      };
+      mentor_availability: {
+        Row: {
+          id: string;
+          mentor_id: string;
+          starts_at: string;
+          ends_at: string;
+          is_booked: boolean;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["mentor_availability"]["Row"]> & {
+          mentor_id: string;
+          starts_at: string;
+          ends_at: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["mentor_availability"]["Row"]>;
+        Relationships: [];
+      };
+      mentor_bookings: {
+        Row: {
+          id: string;
+          availability_id: string;
+          mentor_id: string;
+          student_id: string;
+          order_id: string | null;
+          status: "scheduled" | "completed" | "cancelled";
+          student_notes: string | null;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["mentor_bookings"]["Row"]> & {
+          availability_id: string;
+          mentor_id: string;
+          student_id: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["mentor_bookings"]["Row"]>;
+        Relationships: [];
+      };
+      mentor_feedback: {
+        Row: {
+          id: string;
+          booking_id: string;
+          error_type: "grammar" | "structure" | "citation" | "argument" | "clarity" | "other";
+          detail: string;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["mentor_feedback"]["Row"]> & {
+          booking_id: string;
+          error_type: "grammar" | "structure" | "citation" | "argument" | "clarity" | "other";
+          detail: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["mentor_feedback"]["Row"]>;
+        Relationships: [];
+      };
+      referral_codes: {
+        Row: {
+          code: string;
+          owner_name: string;
+          institution_code: string | null;
+          active: boolean;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["referral_codes"]["Row"]> & {
+          code: string;
+          owner_name: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["referral_codes"]["Row"]>;
+        Relationships: [];
+      };
+      admin_actuals: {
+        Row: { id: number; month: string; metric: string; value: number; created_at: string };
+        Insert: Partial<Database["public"]["Tables"]["admin_actuals"]["Row"]> & {
+          month: string;
+          metric: string;
+          value: number;
+        };
+        Update: Partial<Database["public"]["Tables"]["admin_actuals"]["Row"]>;
+        Relationships: [];
+      };
+      admin_forecasts: {
+        Row: { id: number; month: string; metric: string; value: number; created_at: string };
+        Insert: Partial<Database["public"]["Tables"]["admin_forecasts"]["Row"]> & {
+          month: string;
+          metric: string;
+          value: number;
+        };
+        Update: Partial<Database["public"]["Tables"]["admin_forecasts"]["Row"]>;
+        Relationships: [];
+      };
+      campaign_checklist_items: {
+        Row: { id: string; month: string; item: string; done: boolean; created_at: string };
+        Insert: Partial<Database["public"]["Tables"]["campaign_checklist_items"]["Row"]> & {
+          month: string;
+          item: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["campaign_checklist_items"]["Row"]>;
         Relationships: [];
       };
       reviews: {
@@ -399,7 +507,12 @@ export interface Database {
         Relationships: [];
       };
     };
-    Functions: Record<string, never>;
+    Functions: {
+      book_mentor_slot: {
+        Args: { p_availability_id: string; p_order_id?: string | null };
+        Returns: string;
+      };
+    };
     Enums: {
       app_role: AppRole;
       deadline_status: DeadlineStatus;

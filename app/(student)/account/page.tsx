@@ -43,6 +43,14 @@ export default async function AccountPage() {
       <div>
         <h1 className="text-2xl font-semibold">My account</h1>
         <p className="text-sm text-zinc-500">{user?.email}</p>
+        <div className="mt-4 flex gap-4 text-sm">
+          <Link href="/account/vault" className="text-primary hover:underline">
+            Writing Proof Vault
+          </Link>
+          <Link href="/account/mentoring" className="text-primary hover:underline">
+            Mentor sessions
+          </Link>
+        </div>
       </div>
 
       <div>
