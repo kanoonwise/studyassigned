@@ -45,6 +45,21 @@ test("the contact page has an enquiry form with required consent", async ({ page
   await expect(page.getByRole("button", { name: "Send enquiry" })).toBeVisible();
 });
 
+test("the enquiry form validates without a configured Turnstile site key", async ({ page }) => {
+  // NEXT_PUBLIC_TURNSTILE_SITE_KEY isn't set in this test run (same as any
+  // deployment before Turnstile is configured), so turnstileToken stays
+  // null forever. A schema that only allows `string | undefined` for that
+  // field rejects `null` and every submission fails validation before it
+  // ever reaches the database - regression test for that failure mode.
+  await page.goto("/contact");
+  await page.getByRole("textbox", { name: "Name" }).fill("Test Student");
+  await page.getByRole("textbox", { name: "Email" }).fill("test@example.com");
+  await page.getByRole("textbox", { name: "Message" }).fill("Verification test message.");
+  await page.getByRole("checkbox").check();
+  await page.getByRole("button", { name: "Send enquiry" }).click();
+  await expect(page.getByText("Invalid submission.")).not.toBeVisible({ timeout: 10000 });
+});
+
 test("the Thesis Timeline Planner computes and offers an .ics download", async ({ page }) => {
   await page.goto("/tools/timeline");
   await page.getByLabel("Submission date").fill("2026-12-01");

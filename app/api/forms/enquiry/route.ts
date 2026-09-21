@@ -15,7 +15,13 @@ const enquirySchema = z.object({
   service: z.string().trim().max(200).optional().or(z.literal("")),
   message: z.string().trim().min(1).max(4000),
   consent: z.literal(true),
-  turnstileToken: z.string().optional(),
+  // The client sends an explicit `null` (not just an absent field) until
+  // Turnstile actually verifies - which never happens if
+  // NEXT_PUBLIC_TURNSTILE_SITE_KEY isn't configured yet. `.optional()`
+  // alone accepts `undefined` but rejects `null`, which silently broke
+  // the whole form (every submission failed as "Invalid submission")
+  // whenever Turnstile isn't set up.
+  turnstileToken: z.string().nullable().optional(),
 });
 
 export async function POST(request: NextRequest) {
